@@ -5,13 +5,12 @@ global supEnumerator
 ;gui shit
 Gui, +ToolWindow
 Gui, Margin, 30, 15
-Gui, Font, cDDDDDD s11
+Gui, Font, cDDDDDD s10.5
 Gui, Color, 212121
 GuiWidth := 320, GuiHeight := 50
 Gui, Add, Text,vVar w%GuiWidth%,0
-Gui, -Caption +LastFound +AlwaysOnTop
 Gui, Margin, 5, 15
-Gui, -Caption +LastFound +AlwaysOnTop
+Gui, -Caption +LastFound +border ;+AlwaysOnTop
 Return
 
 ; supEnumerator::EnumAudioEndpoints
