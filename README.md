@@ -1,3 +1,3 @@
 # swap-audio
 
-a simple script that uses VA.ahk to cycle through your audio output devices
+to use this script you must install autohotkey on your pc
