@@ -1,16 +1,39 @@
+#SingleInstance, force
+
 #include VA.ahk
 global Devices := {}
 global Count := 0
-global supEnumerator 
+global supEnumerator
+global curDevice
+
+global showed:=False
+global toggled:=True
+
+global configFile:= "swap\swap.config"
+
 ;gui shit
 Gui, +ToolWindow
-Gui, Margin, 30, 15
-Gui, Font, cDDDDDD s10.5
-Gui, Color, 212121
-GuiWidth := 320, GuiHeight := 50
-Gui, Add, Text,vVar w%GuiWidth%,0
-Gui, Margin, 5, 15
-Gui, -Caption +LastFound +border ;+AlwaysOnTop
+Gui, Margin, 0, 10
+Gui, Font, c767676 s13
+Gui, Color, 191919 ;212121
+GuiWidth := 400, GuiHeight := 50
+TextWidth:= GuiWidth - 80
+ArrowX:= GuiWidth - 25
+Gui, -Caption +LastFound ;+border ;+AlwaysOnTop
+
+;add text
+Gui, Add, Picture, gA2 vTon x10 y10 w30 h30, swap\toggle_on.png
+Gui, Add, Picture, gA2 vToff x10 y10 w30 h30, swap\toggle_off.png
+Gui, Add, Picture, vVolume y10 x10 w30 h30, swap\volume.png
+Gui, Add, Text ,x50 y14 vVar  w%TextWidth%, 0
+Gui, Add, Picture, vAown gHideToggles x%ArrowX% y17 w16 h16, kke\down.svg
+Gui, Add, Picture, vAight gShowToggles x%ArrowX% y17 w16 h16, swap\right.svg
+GuiControl, Hide, Aown
+GuiControl, Hide, Ton
+GuiControl, Hide, Toff
+
+;WinSet, Region, 0-0 w%GuiWidth% h%GuiHeight% R10-10
+DllCall("SetClassLong", "uint", WinExist(), "int", -26, "int", DllCall("GetClassLong", "uint", WinExist(), "int", -26) | 0x20000)
 Return
 
 ; supEnumerator::EnumAudioEndpoints
@@ -57,37 +80,120 @@ SetDefaultEndpoint(DeviceID)
     ObjRelease(IPolicyConfig)
 }
 
-GetDeviceID()
+GetDeviceID(skips)
 {
-    tmp:= VA_GetDeviceName(VA_GetDevice("playback"))
+    tmp:=VA_GetDeviceName(VA_GetDevice("playback"))
     n:=0
-    For DeviceName, DeviceID in Devices{
+    while (skips >= -1){
+        For DeviceName, DeviceID in Devices{
             If (n > 0){
-                n+=1
-                Return DeviceID
+                if(n > skips)
+                    Return, {Id: DeviceID, Name: DeviceName}
+                skips-=1
             }
-            If (DeviceName = tmp)
+            If (DeviceName = tmp){
                 n+=1
+                if (skips = -1)
+                    Return, {Id: DeviceID, Name: DeviceName}
+            }
+                
+        }
     }
-    if(tmp > 1)
-        For DeviceName, DeviceID in Devices
-                Return DeviceID
-}
+}   
 
-;change sound output                            Win + < 
-#<:: 
-{
+;change sound output                            Win + <
+#<::
     load()
-    SetDefaultEndpoint(GetDeviceID())
-    tmp:= VA_GetDeviceName(VA_GetDevice("playback"))
-    ;gui shit
-    GuiControl,,Var,%tmp%
-    Gui,show, % "x" A_ScreenWidth - GuiWidth  " y"  A_ScreenHeight - GuiHeight - 30 " w" Guiwidth " h" GuiHeight
+    curDev:= GetDeviceID(-1)
+    nextDev:= GetDeviceID(0)
+    curDevice:= curDev.Name
+    if !showed
+    {
+        ;i iterate until i find someone that is toggled
+        firstk:= NextDev.Name
+        k:=1
+        while !toggled(NextDev.Name)
+        {
+            nextDev:= GetDeviceID(k)
+            tmp:= NextDev.Name
+            ; se faccio un giro completo e non trovo nulla esco    
+            if firstk = %tmp%
+            {
+                nextDev:=curDev
+                Break
+            }
+            k+=1
+        }
+    }
+    ;end shit
+    tmp:= NextDev.Name
+    if curDevice != %tmp%
+        SetDefaultEndpoint(nextDev.Id)
+    curDevice:= NextDev.Name
+    if showed
+        SetToggles()
+    GuiControl,,Var, %curDevice%
+    Gui,show, % "x" A_ScreenWidth/2 - GuiWidth/2  " y"  A_ScreenHeight/2 - GuiHeight " w" Guiwidth " h" GuiHeight
     SetTimer, off, 800
+    Return
+
+ShowToggles:
+    GuiControl, Hide, Volume
+    SetToggles()
+    Return
+
+SetToggles(){
+    GuiControl, Hide, Ton
+    GuiControl, Hide, Toff
+    If toggled(curDevice)
+        GuiControl, Show, Ton
+    Else
+        GuiControl, Show, Toff
+    GuiControl, Hide, Aight
+    GuiControl, Show, Aown
+    showed:= True
     Return
 }
 
+HideToggles:
+    GuiControl, Hide, Ton
+    GuiControl, Hide, Toff
+    GuiControl, Hide, Aown
+    GuiControl, Show, Aight
+    GuiControl, Show, Volume
+    showed:= False
+    If !toggled(curDevice)
+        Send,#<
+    Return
+
+; scrive nel file ma non so se va a capo
+; deve refreshare il toggle subito ma non lo fa
+; poi cicla anche trai dispositivi togglati
+
+A2:
+    curDev:= GetDeviceID(-1)
+    toggle(curDev.Name)
+    return
 
 off:
-Gui,Hide
+if !showed
+    Gui,Hide
 Return
+
+toggled(deviceName){
+    FileRead, OutputVar, %configFile%
+    StringReplace, newVar, OutputVar, %deviceName%, "differentcharacters" , All
+    Return !(OutputVar != newVar)
+}
+
+toggle(deviceName){
+    FileRead, OutputVar, %configFile%
+    StringReplace, newVar, OutputVar, %deviceName%, , All
+    if (OutputVar != newVar){
+        FileDelete, %configFile%
+        FileAppend, %newVar%, %configFile%
+    }
+    Else{
+        FileAppend, %deviceName%, %configFile%
+    }
+}
