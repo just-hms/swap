@@ -1,6 +1,9 @@
 name: Publish
 
-on: push
+on:
+  release:
+    types:
+      - created
 
 jobs:
   Example:
@@ -20,3 +23,4 @@ jobs:
         with:
           files: |
             swap.ahk
+          
