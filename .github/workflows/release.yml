@@ -25,5 +25,5 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            swap.exe
+            swap.tar.gz
           
