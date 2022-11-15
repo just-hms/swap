@@ -1,6 +1,6 @@
 #SingleInstance, force
 
-#include VA.ahk
+#include lib\VA.ahk
 global Devices := {}
 global Count := 0
 global supEnumerator
@@ -9,7 +9,7 @@ global curDevice
 global showed:=False
 global toggled:=True
 
-global configFile:= "swap\swap.config"
+global configFile:= "lib\swap.config"
 
 ;gui shit
 Gui, +ToolWindow
@@ -22,12 +22,12 @@ ArrowX:= GuiWidth - 25
 Gui, -Caption +LastFound ;+border ;+AlwaysOnTop
 
 ;add text
-Gui, Add, Picture, gA2 vTon x10 y10 w30 h30, swap\toggle_on.png
-Gui, Add, Picture, gA2 vToff x10 y10 w30 h30, swap\toggle_off.png
-Gui, Add, Picture, vVolume y10 x10 w30 h30, swap\volume.png
+Gui, Add, Picture, gA2 vTon x10 y10 w30 h30, lib\images\toggle_on.png
+Gui, Add, Picture, gA2 vToff x10 y10 w30 h30, lib\images\toggle_off.png
+Gui, Add, Picture, vVolume y10 x10 w30 h30, lib\images\volume.png
 Gui, Add, Text ,x50 y14 vVar  w%TextWidth%, 0
-Gui, Add, Picture, vAown gHideToggles x%ArrowX% y17 w16 h16, kke\down.svg
-Gui, Add, Picture, vAight gShowToggles x%ArrowX% y17 w16 h16, swap\right.svg
+Gui, Add, Picture, vAown gHideToggles x%ArrowX% y17 w16 h16, lib\images\down.png
+Gui, Add, Picture, vAight gShowToggles x%ArrowX% y17 w16 h16, lib\images\right.png
 GuiControl, Hide, Aown
 GuiControl, Hide, Ton
 GuiControl, Hide, Toff
