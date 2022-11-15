@@ -9,7 +9,7 @@ A script built using AHK that makes you cycle through your output devices using 
 	https://github.com/just-hms/swap/releases/latest/download/swap.tar.gz
 	```
 - place it somewhere stable
-- add a to the executable in `%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup`
+- add a link to the executable in `%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup`
 
 ## Usage
 
