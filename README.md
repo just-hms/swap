@@ -20,11 +20,11 @@ Press <kbd>Win</kbd> + <kbd><</kbd> to change output, this window will appear on
 
 ![Dialog1](docs/images/Dialog1.png)
 
-## Then
+### Then
 
 Then you can press <kbd><</kbd> again as many time as you want 
 
-## Disable an output
+### Disable an output
 
 If you click on the arrow in the right you can access another view in which you can disable or re-enable outputs
 
